@@ -16,6 +16,7 @@ export const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
     openFolderModal,
     moveShortcutToFolder,
     openContextMenu,
+    isDarkMode,
     effectiveBackgroundDark,
   } = useApp();
 
@@ -100,7 +101,7 @@ export const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
           className={`relative flex items-center justify-center transition-all duration-200 group-hover:scale-105 ${
             isDragOver
               ? 'ring-3 ring-blue-500 bg-blue-500/20 scale-105 shadow-lg'
-              : effectiveBackgroundDark
+              : isDarkMode
               ? 'bg-neutral-900/80 hover:bg-neutral-800/90 border border-white/10 hover:border-white/30 text-white shadow-xs group-hover:shadow-md'
               : 'bg-white/85 hover:bg-white border border-neutral-200/80 hover:border-neutral-400 text-neutral-900 shadow-xs group-hover:shadow-md'
           } backdrop-blur-xl ${iconBoxSize}`}
@@ -149,7 +150,7 @@ export const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
         <div className="w-full mt-2">
           <span
             className={`block ${titleTextClass} truncate w-full transition-colors leading-tight px-0.5 ${
-              effectiveBackgroundDark
+              effectiveBackgroundDark || isDarkMode
                 ? 'text-white/90 group-hover:text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]'
                 : 'text-neutral-800 group-hover:text-neutral-950'
             }`}
@@ -188,15 +189,15 @@ export const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
       className={`group relative flex items-center ${cardPadding} border backdrop-blur-xl transition-all cursor-pointer select-none shadow-xs hover:shadow-md ${
         isDragOver
           ? 'bg-blue-500/20 border-blue-500 ring-2 ring-blue-400 scale-[1.02] z-10'
-          : effectiveBackgroundDark
-          ? 'bg-neutral-950/80 border-white/10 hover:border-white/30 text-white'
+          : isDarkMode
+          ? 'bg-neutral-900/80 hover:bg-neutral-850 border-white/10 hover:border-white/30 text-white'
           : 'bg-white/90 border-neutral-200/90 hover:border-neutral-400 text-neutral-900'
       }`}
     >
       {/* 2x2 Mini Icon Grid Preview */}
       <div
         className={`${iconContainerSize} ${
-          effectiveBackgroundDark ? 'bg-neutral-800 border-neutral-700' : 'bg-neutral-100 border-neutral-200/80'
+          isDarkMode ? 'bg-neutral-800 border-neutral-700' : 'bg-neutral-100 border-neutral-200/80'
         } flex-shrink-0 border shadow-xs grid grid-cols-2 gap-0.5 overflow-hidden`}
       >
         {previewItems.length === 0 ? (
@@ -241,14 +242,14 @@ export const FolderCard: React.FC<FolderCardProps> = ({ folder }) => {
       <div className="min-w-0 flex-1">
         <h3
           className={`${titleClass} truncate flex items-center gap-1.5 transition-colors ${
-            effectiveBackgroundDark ? 'text-white group-hover:text-white' : 'text-neutral-900 group-hover:text-neutral-950'
+            isDarkMode ? 'text-white group-hover:text-white' : 'text-neutral-900 group-hover:text-neutral-950'
           }`}
         >
           <span>{folder.name}</span>
         </h3>
         <p
           className={`${countClass} transition-colors ${
-            effectiveBackgroundDark ? 'text-neutral-400 group-hover:text-neutral-300' : 'text-neutral-500 group-hover:text-neutral-700'
+            isDarkMode ? 'text-neutral-400 group-hover:text-neutral-300' : 'text-neutral-500 group-hover:text-neutral-700'
           }`}
         >
           {folderShortcuts.length} raccourci{folderShortcuts.length > 1 ? 's' : ''}

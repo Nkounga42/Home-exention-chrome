@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderPlus, Pin } from 'lucide-react';
+import { FolderPlus } from 'lucide-react';
 import { Shortcut } from '../types';
 import { useApp } from '../context/AppContext';
 import { extractDomain, getFaviconUrl } from '../utils/favicon';
@@ -15,6 +15,7 @@ export const ShortcutCard: React.FC<ShortcutCardProps> = ({ shortcut }) => {
     incrementClick,
     setFolderCreationCandidate,
     openContextMenu,
+    isDarkMode,
     effectiveBackgroundDark,
   } = useApp();
 
@@ -104,7 +105,7 @@ export const ShortcutCard: React.FC<ShortcutCardProps> = ({ shortcut }) => {
         return (
           <div
             className={`${containerSize} ${
-              effectiveBackgroundDark ? 'bg-neutral-800/90 border-neutral-700' : 'bg-neutral-100 border-neutral-200/90'
+              isDarkMode ? 'bg-neutral-800/90 border-neutral-700' : 'bg-neutral-100 border-neutral-200/90'
             } flex items-center justify-center flex-shrink-0 border overflow-hidden p-2 shadow-xs`}
           >
             <img
@@ -123,7 +124,7 @@ export const ShortcutCard: React.FC<ShortcutCardProps> = ({ shortcut }) => {
         return (
           <div
             className={`${containerSize} ${
-              effectiveBackgroundDark ? 'bg-neutral-800/90 border-neutral-700' : 'bg-neutral-100 border-neutral-200/90'
+              isDarkMode ? 'bg-neutral-800/90 border-neutral-700' : 'bg-neutral-100 border-neutral-200/90'
             } flex items-center justify-center flex-shrink-0 border overflow-hidden p-2 shadow-xs`}
           >
             <img
@@ -219,25 +220,18 @@ export const ShortcutCard: React.FC<ShortcutCardProps> = ({ shortcut }) => {
           className={`relative flex items-center justify-center transition-all duration-200 group-hover:scale-105 ${
             isDragOver
               ? 'ring-3 ring-blue-500 bg-blue-500/20 scale-105 shadow-lg'
-              : effectiveBackgroundDark
+              : isDarkMode
               ? 'bg-neutral-900/80 hover:bg-neutral-800/90 border border-white/10 hover:border-white/30 text-white shadow-xs group-hover:shadow-md'
               : 'bg-white/85 hover:bg-white border border-neutral-200/80 hover:border-neutral-400 text-neutral-900 shadow-xs group-hover:shadow-md'
           } backdrop-blur-xl ${iconBoxSize}`}
         >
           {renderIconGraphic(iconBoxSize, faviconSize, lucideSize, letterSize)}
-
-          {/* Pinned Badge */}
-          {shortcut.pinned && (
-            <div className="absolute -top-1 -left-1 p-1 rounded-full bg-amber-500 text-white shadow-xs">
-              <Pin size={8} />
-            </div>
-          )}
         </div>
 
         {/* Title Underneath Icon */}
         <span
           className={`mt-2 ${titleTextClass} truncate w-full transition-colors leading-tight px-0.5 ${
-            effectiveBackgroundDark
+            effectiveBackgroundDark || isDarkMode
               ? 'text-white/90 group-hover:text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]'
               : 'text-neutral-800 group-hover:text-neutral-950'
           }`}
@@ -292,8 +286,8 @@ export const ShortcutCard: React.FC<ShortcutCardProps> = ({ shortcut }) => {
       } ${
         isDragOver
           ? 'bg-blue-500/20 border-blue-500 ring-2 ring-blue-400 scale-[1.03] shadow-md z-10'
-          : effectiveBackgroundDark
-          ? 'bg-neutral-950/80 border-white/10 hover:border-white/30 text-white'
+          : isDarkMode
+          ? 'bg-neutral-900/80 hover:bg-neutral-800/90 border-white/10 hover:border-white/30 text-white'
           : 'bg-white/90 border-neutral-200/90 hover:border-neutral-400 text-neutral-900'
       }`}
     >
@@ -311,16 +305,15 @@ export const ShortcutCard: React.FC<ShortcutCardProps> = ({ shortcut }) => {
         <div className="flex items-center gap-1.5">
           <h3
             className={`${titleClass} truncate font-semibold transition-colors ${
-              effectiveBackgroundDark ? 'text-white group-hover:text-white' : 'text-neutral-900 group-hover:text-neutral-950'
+              isDarkMode ? 'text-white group-hover:text-white' : 'text-neutral-900 group-hover:text-neutral-950'
             }`}
           >
             {shortcut.title}
           </h3>
-          {shortcut.pinned && <Pin size={11} className="text-amber-500 flex-shrink-0" />}
         </div>
         <p
           className={`${domainClass} truncate transition-colors ${
-            effectiveBackgroundDark ? 'text-neutral-400 group-hover:text-neutral-300' : 'text-neutral-500 group-hover:text-neutral-700'
+            isDarkMode ? 'text-neutral-400 group-hover:text-neutral-300' : 'text-neutral-500 group-hover:text-neutral-700'
           }`}
         >
           {domain || shortcut.url}

@@ -13,6 +13,7 @@ export const ShortcutGrid: React.FC = () => {
     addFolder,
     settings,
     updateSettings,
+    isDarkMode,
     effectiveBackgroundDark,
   } = useApp();
 
@@ -109,14 +110,14 @@ export const ShortcutGrid: React.FC = () => {
         <div className="flex items-center gap-2">
           <span
             className={`text-xs font-semibold uppercase tracking-wider ${
-              effectiveBackgroundDark ? 'text-white/70' : 'text-neutral-500'
+              effectiveBackgroundDark || isDarkMode ? 'text-white/80' : 'text-neutral-600'
             }`}
           >
             Raccourcis
           </span>
           <span
             className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
-              effectiveBackgroundDark ? 'bg-white/10 text-white/90' : 'bg-neutral-200/80 text-neutral-700'
+              isDarkMode ? 'bg-white/10 text-white/90' : 'bg-neutral-200/80 text-neutral-700'
             }`}
           >
             {rootShortcuts.length + folders.length}
@@ -128,7 +129,7 @@ export const ShortcutGrid: React.FC = () => {
           {/* Display Mode Toggle: Icons vs Cards */}
           <div
             className={`flex items-center p-0.5 rounded-xl border backdrop-blur-md ${
-              effectiveBackgroundDark
+              isDarkMode
                 ? 'bg-black/40 border-white/15 text-white'
                 : 'bg-white/80 border-neutral-200/90 text-neutral-800'
             }`}
@@ -140,7 +141,7 @@ export const ShortcutGrid: React.FC = () => {
               title="Affichage: Icônes avec titre en dessous"
               className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 layoutStyle === 'icons'
-                  ? effectiveBackgroundDark
+                  ? isDarkMode
                     ? 'bg-white text-neutral-950 shadow-xs'
                     : 'bg-neutral-900 text-white shadow-xs'
                   : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -157,7 +158,7 @@ export const ShortcutGrid: React.FC = () => {
               title="Affichage: Cartes horizontales"
               className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 layoutStyle === 'cards'
-                  ? effectiveBackgroundDark
+                  ? isDarkMode
                     ? 'bg-white text-neutral-950 shadow-xs'
                     : 'bg-neutral-900 text-white shadow-xs'
                   : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white'
@@ -176,7 +177,7 @@ export const ShortcutGrid: React.FC = () => {
               onClick={() => setShowColumnPicker((prev) => !prev)}
               title="Changer le nombre de colonnes de la grille"
               className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-xs font-semibold border backdrop-blur-md transition-all cursor-pointer ${
-                effectiveBackgroundDark
+                isDarkMode
                   ? 'bg-black/40 border-white/15 text-white/90 hover:bg-black/60 hover:text-white'
                   : 'bg-white/80 border-neutral-200/90 text-neutral-700 hover:bg-white hover:text-neutral-900'
               }`}
@@ -191,7 +192,7 @@ export const ShortcutGrid: React.FC = () => {
             {showColumnPicker && (
               <div
                 className={`absolute right-0 top-full mt-1.5 p-1.5 rounded-2xl border shadow-xl backdrop-blur-xl z-30 flex flex-col gap-0.5 min-w-[120px] ${
-                  effectiveBackgroundDark
+                  isDarkMode
                     ? 'bg-neutral-900/95 border-white/20 text-white'
                     : 'bg-white/95 border-neutral-200 text-neutral-900'
                 }`}
@@ -211,7 +212,7 @@ export const ShortcutGrid: React.FC = () => {
                     className={`px-2.5 py-1 text-xs rounded-xl font-medium text-left transition-colors flex items-center justify-between cursor-pointer ${
                       gridColumns === opt.id
                         ? 'bg-blue-600 text-white font-bold'
-                        : effectiveBackgroundDark
+                        : isDarkMode
                         ? 'hover:bg-white/10 text-neutral-300 hover:text-white'
                         : 'hover:bg-neutral-100 text-neutral-700 hover:text-neutral-900'
                     }`}
@@ -247,7 +248,7 @@ export const ShortcutGrid: React.FC = () => {
           >
             <div
               className={`flex items-center justify-center border-2 border-dashed transition-all duration-200 group-hover:scale-105 backdrop-blur-md ${actionIconBoxSize} ${
-                effectiveBackgroundDark
+                isDarkMode
                   ? 'border-white/20 group-hover:border-white/50 bg-black/30 group-hover:bg-black/50 text-white/60 group-hover:text-white'
                   : 'border-neutral-300 group-hover:border-neutral-500 bg-white/40 group-hover:bg-white/80 text-neutral-400 group-hover:text-neutral-800'
               }`}
@@ -256,7 +257,7 @@ export const ShortcutGrid: React.FC = () => {
             </div>
             <span
               className={`mt-2 text-xs font-medium truncate w-full transition-colors leading-tight px-0.5 ${
-                effectiveBackgroundDark
+                effectiveBackgroundDark || isDarkMode
                   ? 'text-white/70 group-hover:text-white'
                   : 'text-neutral-600 group-hover:text-neutral-900'
               }`}
@@ -270,14 +271,14 @@ export const ShortcutGrid: React.FC = () => {
             type="button"
             onClick={() => openAddModal()}
             className={`flex items-center ${cardActionTilePadding} border border-dashed backdrop-blur-md transition-all cursor-pointer select-none text-left group ${
-              effectiveBackgroundDark
+              isDarkMode
                 ? 'border-white/20 hover:border-white/40 bg-black/40 hover:bg-black/60 text-white/80 hover:text-white'
                 : 'border-neutral-300 hover:border-neutral-500 bg-white/50 hover:bg-white text-neutral-500 hover:text-neutral-900'
             }`}
           >
             <div
               className={`${cardActionIconContainerSize} border border-dashed flex items-center justify-center flex-shrink-0 transition-colors ${
-                effectiveBackgroundDark
+                isDarkMode
                   ? 'border-white/20 text-white/60 group-hover:text-white group-hover:border-white/50'
                   : 'border-neutral-300 text-neutral-400 group-hover:text-neutral-900 group-hover:border-neutral-500'
               }`}
@@ -288,7 +289,7 @@ export const ShortcutGrid: React.FC = () => {
               <span className="text-sm font-semibold block">Ajouter un lien</span>
               <span
                 className={`text-xs block truncate ${
-                  effectiveBackgroundDark ? 'text-white/50 group-hover:text-white/70' : 'text-neutral-400'
+                  isDarkMode ? 'text-white/50 group-hover:text-white/70' : 'text-neutral-400'
                 }`}
               >
                 Nouveau raccourci
@@ -306,7 +307,7 @@ export const ShortcutGrid: React.FC = () => {
           >
             <div
               className={`flex items-center justify-center border-2 border-dashed transition-all duration-200 group-hover:scale-105 backdrop-blur-md ${actionIconBoxSize} ${
-                effectiveBackgroundDark
+                isDarkMode
                   ? 'border-white/20 group-hover:border-blue-400 bg-black/30 group-hover:bg-black/50 text-white/60 group-hover:text-blue-300'
                   : 'border-neutral-300 group-hover:border-blue-500 bg-white/40 group-hover:bg-white/80 text-neutral-400 group-hover:text-blue-600'
               }`}
@@ -315,7 +316,7 @@ export const ShortcutGrid: React.FC = () => {
             </div>
             <span
               className={`mt-2 text-xs font-medium truncate w-full transition-colors leading-tight px-0.5 ${
-                effectiveBackgroundDark
+                effectiveBackgroundDark || isDarkMode
                   ? 'text-white/70 group-hover:text-blue-300'
                   : 'text-neutral-600 group-hover:text-blue-600'
               }`}
@@ -329,14 +330,14 @@ export const ShortcutGrid: React.FC = () => {
             type="button"
             onClick={handleCreateEmptyFolder}
             className={`flex items-center ${cardActionTilePadding} border border-dashed backdrop-blur-md transition-all cursor-pointer select-none text-left group ${
-              effectiveBackgroundDark
+              isDarkMode
                 ? 'border-white/20 hover:border-blue-400 bg-black/40 hover:bg-black/60 text-white/80 hover:text-blue-300'
                 : 'border-neutral-300/80 hover:border-blue-500/70 bg-white/40 hover:bg-white/80 text-neutral-500 hover:text-blue-600'
             }`}
           >
             <div
               className={`${cardActionIconContainerSize} border border-dashed flex items-center justify-center flex-shrink-0 transition-colors ${
-                effectiveBackgroundDark
+                isDarkMode
                   ? 'border-white/20 text-white/60 group-hover:text-blue-400 group-hover:border-blue-400/70'
                   : 'border-neutral-300 text-neutral-400 group-hover:text-blue-600 group-hover:border-blue-500/70'
               }`}
@@ -347,7 +348,7 @@ export const ShortcutGrid: React.FC = () => {
               <span className="text-sm font-semibold block">Créer un dossier</span>
               <span
                 className={`text-xs block truncate ${
-                  effectiveBackgroundDark ? 'text-white/50 group-hover:text-white/70' : 'text-neutral-400'
+                  isDarkMode ? 'text-white/50 group-hover:text-white/70' : 'text-neutral-400'
                 }`}
               >
                 Glisser un lien sur un autre
@@ -360,7 +361,7 @@ export const ShortcutGrid: React.FC = () => {
       {/* Helpful Hint banner */}
       <div
         className={`mt-4 flex items-center justify-center gap-1.5 text-xs text-center select-none ${
-          effectiveBackgroundDark
+          effectiveBackgroundDark || isDarkMode
             ? 'text-white/80 drop-shadow-[0_1px_3px_rgba(0,0,0,0.7)] font-medium'
             : 'text-neutral-500'
         }`}

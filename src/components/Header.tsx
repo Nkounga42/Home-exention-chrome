@@ -4,7 +4,7 @@ import { Plus, Settings, Sun, Moon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { settings, updateSettings, openAddModal, effectiveBackgroundDark } = useApp();
+  const { settings, updateSettings, openAddModal, isDarkMode, effectiveBackgroundDark } = useApp();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -29,10 +29,6 @@ export const Header: React.FC = () => {
     });
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
-
-  const isDarkMode =
-    settings.theme === 'dark' ||
-    (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   const toggleTheme = () => {
     const nextTheme = isDarkMode ? 'light' : 'dark';
@@ -69,7 +65,7 @@ export const Header: React.FC = () => {
           id="header-add-shortcut-btn"
           onClick={() => openAddModal()}
           className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer ${
-            effectiveBackgroundDark
+            isDarkMode
               ? 'bg-white text-neutral-950 hover:bg-neutral-100 hover:shadow-md'
               : 'bg-neutral-900 text-white hover:bg-neutral-800'
           }`}
@@ -83,7 +79,7 @@ export const Header: React.FC = () => {
           onClick={toggleTheme}
           title={isDarkMode ? 'Passer en Mode Clair' : 'Passer en Mode Sombre'}
           className={`p-2 rounded-xl backdrop-blur-md transition-all cursor-pointer shadow-xs border ${
-            effectiveBackgroundDark
+            isDarkMode
               ? 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               : 'bg-white/90 text-neutral-700 hover:bg-white border-neutral-200/90'
           }`}
@@ -96,7 +92,7 @@ export const Header: React.FC = () => {
           to="/settings"
           title="Paramètres & Arrière-plan"
           className={`p-2 rounded-xl backdrop-blur-md transition-all cursor-pointer shadow-xs border ${
-            effectiveBackgroundDark
+            isDarkMode
               ? 'bg-black/50 hover:bg-black/70 text-white border-white/20'
               : 'bg-white/90 text-neutral-700 hover:bg-white border-neutral-200/90'
           }`}

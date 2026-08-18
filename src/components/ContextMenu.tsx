@@ -31,7 +31,7 @@ export const ContextMenu: React.FC = () => {
     updateFolder,
     deleteFolder,
     openAddModal,
-    effectiveBackgroundDark,
+    isDarkMode,
   } = useApp();
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -186,15 +186,15 @@ export const ContextMenu: React.FC = () => {
   };
 
   const itemBaseClass = `w-full px-3 py-2 text-xs font-medium rounded-xl flex items-center gap-2.5 transition-colors text-left cursor-pointer select-none`;
-  const itemNormalClass = effectiveBackgroundDark
+  const itemNormalClass = isDarkMode
     ? 'text-neutral-200 hover:text-white hover:bg-white/10'
     : 'text-neutral-700 hover:text-neutral-950 hover:bg-neutral-100';
 
-  const itemDangerClass = effectiveBackgroundDark
+  const itemDangerClass = isDarkMode
     ? 'text-red-400 hover:text-red-300 hover:bg-red-950/40'
     : 'text-red-600 hover:text-red-700 hover:bg-red-50';
 
-  const separatorClass = effectiveBackgroundDark
+  const separatorClass = isDarkMode
     ? 'border-t border-white/10 my-1'
     : 'border-t border-neutral-200/90 my-1';
 
@@ -204,7 +204,7 @@ export const ContextMenu: React.FC = () => {
       id="app-context-menu"
       style={{ left: `${left}px`, top: `${top}px` }}
       className={`fixed z-50 w-60 rounded-2xl p-1.5 border shadow-2xl backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-150 select-none ${
-        effectiveBackgroundDark
+        isDarkMode
           ? 'bg-neutral-900/95 border-white/15 text-white shadow-black/60'
           : 'bg-white/95 border-neutral-200/90 text-neutral-900 shadow-neutral-900/20'
       }`}
@@ -299,7 +299,7 @@ export const ContextMenu: React.FC = () => {
             {showFolderSubmenu && (
               <div
                 className={`absolute left-full top-0 ml-1 w-48 p-1 rounded-xl border shadow-xl backdrop-blur-xl z-50 flex flex-col gap-0.5 ${
-                  effectiveBackgroundDark
+                  isDarkMode
                     ? 'bg-neutral-900/95 border-white/20 text-white'
                     : 'bg-white/95 border-neutral-200 text-neutral-900'
                 }`}

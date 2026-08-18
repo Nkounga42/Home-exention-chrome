@@ -21,6 +21,7 @@ interface AppContextType {
   folders: Folder[];
   categories: Category[];
   settings: AppSettings;
+  isDarkMode: boolean;
   effectiveBackgroundDark: boolean;
   effectiveBackgroundLuminance: number;
   notes: NoteItem[];
@@ -128,32 +129,35 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     sampledImageLuminance
   );
 
+  const [systemIsDark, setSystemIsDark] = useState<boolean>(() => {
+    return (
+      typeof window !== 'undefined' &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    );
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = (e: MediaQueryListEvent) => setSystemIsDark(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  const isDarkMode =
+    settings.theme === 'dark' || (settings.theme === 'system' && systemIsDark);
+
   // Sync dark class on root html with full system listener support
   useEffect(() => {
-    const applyTheme = () => {
-      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const isDark =
-        settings.theme === 'dark' ||
-        (settings.theme === 'system' && isSystemDark);
-
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.style.colorScheme = 'dark';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.style.colorScheme = 'light';
-      }
-    };
-
-    applyTheme();
-
-    if (settings.theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const listener = () => applyTheme();
-      mediaQuery.addEventListener('change', listener);
-      return () => mediaQuery.removeEventListener('change', listener);
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
     }
-  }, [settings.theme]);
+  }, [isDarkMode]);
 
   // Initial weather load
   const refreshWeather = async () => {
@@ -408,6 +412,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         folders,
         categories,
         settings,
+        isDarkMode,
         effectiveBackgroundDark,
         effectiveBackgroundLuminance,
         notes,

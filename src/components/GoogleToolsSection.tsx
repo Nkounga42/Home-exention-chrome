@@ -266,7 +266,7 @@ const GoogleToolCard: React.FC<ToolItemProps> = ({ tool, isAdded, onAdd, isDarkB
 };
 
 export const GoogleToolsSection: React.FC = () => {
-  const { shortcuts, addShortcut, effectiveBackgroundDark } = useApp();
+  const { shortcuts, addShortcut, isDarkMode } = useApp();
   const [filterQuery, setFilterQuery] = useState('');
   const [feedbackIds, setFeedbackIds] = useState<Record<string, boolean>>({});
 
@@ -318,29 +318,29 @@ export const GoogleToolsSection: React.FC = () => {
     <section
       id="google-tools-container"
       className={`w-full mt-10 p-5 sm:p-6 rounded-3xl backdrop-blur-xl border transition-all shadow-xs ${
-        effectiveBackgroundDark
-          ? 'bg-neutral-950/80 border-white/10 text-white'
-          : 'bg-neutral-100/90 border-neutral-200/90 text-neutral-900'
+        isDarkMode
+          ? 'bg-neutral-900/80 border-white/10 text-white'
+          : 'bg-white/90 border-neutral-200/90 text-neutral-900'
       }`}
     >
       {/* Header Container */}
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b ${
-        effectiveBackgroundDark ? 'border-white/10' : 'border-neutral-200/80'
+        isDarkMode ? 'border-white/10' : 'border-neutral-200/80'
       }`}>
         <div>
           <div className="flex items-center gap-2">
-            <h3 className={`text-sm font-bold tracking-tight ${effectiveBackgroundDark ? 'text-white' : 'text-neutral-900'}`}>
+            <h3 className={`text-sm font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-neutral-900'}`}>
               Outils & Services Google
             </h3>
             <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
-              effectiveBackgroundDark
+              isDarkMode
                 ? 'bg-white/10 text-white/90'
                 : 'bg-neutral-200 text-neutral-700'
             }`}>
               {GOOGLE_TOOLS.length}
             </span>
           </div>
-          <p className={`text-xs mt-0.5 ${effectiveBackgroundDark ? 'text-neutral-400' : 'text-neutral-500'}`}>
+          <p className={`text-xs mt-0.5 ${isDarkMode ? 'text-neutral-400' : 'text-neutral-500'}`}>
             Accès rapide aux applications Google. Cliquez pour ouvrir ou sur le « + » pour épingler dans vos raccourcis.
           </p>
         </div>
@@ -348,7 +348,7 @@ export const GoogleToolsSection: React.FC = () => {
         {/* Filter Input */}
         <div className="relative w-full sm:w-64">
           <Search size={14} className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${
-            effectiveBackgroundDark ? 'text-neutral-400' : 'text-neutral-400'
+            isDarkMode ? 'text-neutral-400' : 'text-neutral-400'
           }`} />
           <input
             id="google-tools-filter-input"
@@ -357,7 +357,7 @@ export const GoogleToolsSection: React.FC = () => {
             onChange={(e) => setFilterQuery(e.target.value)}
             placeholder="Filtrer un outil Google..."
             className={`w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border focus:outline-none focus:ring-2 ${
-              effectiveBackgroundDark
+              isDarkMode
                 ? 'bg-black/50 border-white/15 text-white placeholder-neutral-400 focus:ring-white/20'
                 : 'bg-white border-neutral-200 text-neutral-900 placeholder-neutral-400 focus:ring-neutral-400'
             }`}
@@ -373,7 +373,7 @@ export const GoogleToolsSection: React.FC = () => {
             tool={tool}
             isAdded={Boolean(feedbackIds[tool.id] || isToolInShortcuts(tool))}
             onAdd={handleAddShortcut}
-            isDarkBg={effectiveBackgroundDark}
+            isDarkBg={isDarkMode}
           />
         ))}
       </div>
