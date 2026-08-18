@@ -5,8 +5,6 @@ import {
   Plus,
   Pencil,
   Trash2,
-  LogOut,
-  ExternalLink,
   Check,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
@@ -20,16 +18,16 @@ export const FolderModal: React.FC = () => {
     closeFolderModal,
     shortcuts,
     openAddModal,
-    openEditModal,
-    deleteShortcut,
     deleteFolder,
     updateFolder,
-    moveShortcutToFolder,
+    openContextMenu,
     settings,
   } = useApp();
 
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [folderName, setFolderName] = useState('');
+
+  const layoutStyle = settings.layoutStyle || 'icons';
 
   useEffect(() => {
     if (activeFolderModal) {
@@ -69,19 +67,8 @@ export const FolderModal: React.FC = () => {
     }
   };
 
-  const handleRemoveFromFolder = (e: React.MouseEvent, shortcutId: string) => {
-    e.stopPropagation();
-    moveShortcutToFolder(shortcutId, null);
-  };
-
-  const handleDeleteShortcut = (e: React.MouseEvent, shortcutId: string) => {
-    e.stopPropagation();
-    deleteShortcut(shortcutId);
-  };
-
-  const handleEditShortcut = (e: React.MouseEvent, s: Shortcut) => {
-    e.stopPropagation();
-    openEditModal(s);
+  const handleContextMenu = (e: React.MouseEvent, s: Shortcut) => {
+    openContextMenu(e, 'shortcut', s);
   };
 
   return (
@@ -177,7 +164,52 @@ export const FolderModal: React.FC = () => {
                 Glissez des raccourcis dans ce dossier ou cliquez sur Ajouter
               </p>
             </div>
+          ) : layoutStyle === 'icons' ? (
+            /* Icon on top + title below inside Folder */
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4">
+              {folderShortcuts.map((s) => {
+                return (
+                  <div
+                    key={s.id}
+                    onClick={() => handleOpenShortcut(s)}
+                    onContextMenu={(e) => handleContextMenu(e, s)}
+                    className="group relative flex flex-col items-center justify-start text-center cursor-pointer select-none p-2 rounded-2xl transition-all hover:bg-neutral-100/60 dark:hover:bg-neutral-800/50"
+                  >
+                    {/* Icon Box */}
+                    <div className="relative w-14 h-14 sm:w-15 sm:h-15 rounded-2xl bg-neutral-100 dark:bg-neutral-800 border border-neutral-200/80 dark:border-neutral-700 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform overflow-hidden">
+                      {s.iconType === 'lucide' ? (
+                        <div
+                          className="w-full h-full flex items-center justify-center text-white"
+                          style={{ backgroundColor: s.color || '#3b82f6' }}
+                        >
+                          {React.createElement(getLucideIcon(s.lucideIconName), { size: 24 })}
+                        </div>
+                      ) : (
+                        <div className="w-full h-full p-2.5 flex items-center justify-center">
+                          <img
+                            src={getFaviconUrl(s.url, 128)}
+                            alt={s.title}
+                            className="w-7 h-7 object-contain"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Title underneath */}
+                    <span
+                      className="mt-2 text-xs font-medium text-neutral-800 dark:text-neutral-200 truncate w-full group-hover:text-neutral-950 dark:group-hover:text-white px-0.5"
+                      title={s.title}
+                    >
+                      {s.title}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
+            /* Horizontal Cards inside Folder */
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
               {folderShortcuts.map((s) => {
                 const domain = extractDomain(s.url);
@@ -185,6 +217,7 @@ export const FolderModal: React.FC = () => {
                   <div
                     key={s.id}
                     onClick={() => handleOpenShortcut(s)}
+                    onContextMenu={(e) => handleContextMenu(e, s)}
                     className="group relative flex items-center gap-3 p-3 rounded-2xl bg-neutral-50 dark:bg-neutral-800/80 hover:bg-white dark:hover:bg-neutral-800 border border-neutral-200/70 dark:border-neutral-700/60 hover:border-neutral-400 dark:hover:border-neutral-600 transition-all cursor-pointer shadow-xs hover:shadow-sm"
                   >
                     {/* Icon */}
@@ -216,36 +249,6 @@ export const FolderModal: React.FC = () => {
                         {domain}
                       </p>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        type="button"
-                        onClick={(e) => handleRemoveFromFolder(e, s.id)}
-                        title="Sortir du dossier"
-                        className="p-1 rounded-lg text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors"
-                      >
-                        <LogOut size={13} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={(e) => handleEditShortcut(e, s)}
-                        title="Modifier"
-                        className="p-1 rounded-lg text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
-                      >
-                        <Pencil size={13} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={(e) => handleDeleteShortcut(e, s.id)}
-                        title="Supprimer"
-                        className="p-1 rounded-lg text-neutral-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
                   </div>
                 );
               })}
@@ -255,7 +258,7 @@ export const FolderModal: React.FC = () => {
 
         {/* Footer info note */}
         <div className="pt-3 border-t border-neutral-200/80 dark:border-neutral-800 text-[11px] text-neutral-400 flex items-center justify-between">
-          <span>Cliquez sur l'icône de sortie pour replacer un raccourci sur la grille principale</span>
+          <span>Clic droit sur un raccourci pour ouvrir le menu contextuel (déplacer, modifier, supprimer)</span>
           <button
             onClick={closeFolderModal}
             className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-lg text-xs font-medium cursor-pointer"

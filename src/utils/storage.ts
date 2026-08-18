@@ -149,6 +149,8 @@ export const DEFAULT_SHORTCUTS: Shortcut[] = [
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'dark',
   density: 'normal',
+  layoutStyle: 'icons',
+  gridColumns: 'auto',
   searchEngine: 'google',
   openInNewTab: true,
   showClock: true,

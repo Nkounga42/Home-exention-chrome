@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { AppSettings, Category, Folder, NoteItem, Shortcut, WeatherData } from '../types';
+import { AppSettings, Category, ContextMenuItemType, ContextMenuState, Folder, NoteItem, Shortcut, WeatherData } from '../types';
 import { fetchLiveWeather } from '../utils/weather';
+import { CURATED_WALLPAPERS } from '../utils/wallpapers';
+import { getEffectiveBackgroundLuminance, sampleImageBrightness } from '../utils/contrast';
 import {
   loadCategories,
   loadFolders,
@@ -19,6 +21,8 @@ interface AppContextType {
   folders: Folder[];
   categories: Category[];
   settings: AppSettings;
+  effectiveBackgroundDark: boolean;
+  effectiveBackgroundLuminance: number;
   notes: NoteItem[];
   weather: WeatherData | null;
   isLoadingWeather: boolean;
@@ -26,6 +30,9 @@ interface AppContextType {
   editingShortcut: Shortcut | null;
   activeFolderModal: Folder | null;
   folderCreationCandidate: { sourceId: string; targetId: string } | null;
+  contextMenu: ContextMenuState | null;
+  openContextMenu: (e: React.MouseEvent, type: ContextMenuItemType, item: Shortcut | Folder) => void;
+  closeContextMenu: () => void;
   openAddModal: (categoryId?: string, folderId?: string) => void;
   openEditModal: (shortcut: Shortcut) => void;
   closeModal: () => void;
@@ -68,16 +75,83 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [editingShortcut, setEditingShortcut] = useState<Shortcut | null>(null);
   const [activeFolderModal, setActiveFolderModal] = useState<Folder | null>(null);
   const [folderCreationCandidate, setFolderCreationCandidate] = useState<{ sourceId: string; targetId: string } | null>(null);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+  const [sampledImageLuminance, setSampledImageLuminance] = useState<number | null>(null);
 
-  // Sync dark class on root html
+  const openContextMenu = (e: React.MouseEvent, type: ContextMenuItemType, item: Shortcut | Folder) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({
+      isOpen: true,
+      x: e.clientX,
+      y: e.clientY,
+      type,
+      item,
+    });
+  };
+
+  const closeContextMenu = () => {
+    setContextMenu(null);
+  };
+
+  // Sample image brightness when background image changes
   useEffect(() => {
-    const isDark =
-      settings.theme === 'dark' ||
-      (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    if (isDark) {
-      document.documentElement.classList.add('dark');
+    const bg = settings.background;
+    let activeUrl = '';
+
+    if (bg.type === 'curated') {
+      const found = CURATED_WALLPAPERS.find((w) => w.id === bg.wallpaperId);
+      if (found) {
+        setSampledImageLuminance(found.luminance);
+        return;
+      }
+    } else if (bg.type === 'custom' && bg.customUrl) {
+      activeUrl = bg.customUrl;
+    } else if (bg.type === 'daily_unsplash') {
+      activeUrl = 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=2560&q=85';
     } else {
-      document.documentElement.classList.remove('dark');
+      setSampledImageLuminance(null);
+      return;
+    }
+
+    if (activeUrl) {
+      sampleImageBrightness(activeUrl).then((lum) => {
+        setSampledImageLuminance(lum);
+      });
+    }
+  }, [settings.background.type, settings.background.wallpaperId, settings.background.customUrl]);
+
+  // Compute live effective background darkness factoring in wallpaper luminance, solid color, overlay, and theme
+  const { isDark: effectiveBackgroundDark, luminance: effectiveBackgroundLuminance } = getEffectiveBackgroundLuminance(
+    settings.background,
+    settings.theme,
+    sampledImageLuminance
+  );
+
+  // Sync dark class on root html with full system listener support
+  useEffect(() => {
+    const applyTheme = () => {
+      const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark =
+        settings.theme === 'dark' ||
+        (settings.theme === 'system' && isSystemDark);
+
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.style.colorScheme = 'light';
+      }
+    };
+
+    applyTheme();
+
+    if (settings.theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => applyTheme();
+      mediaQuery.addEventListener('change', listener);
+      return () => mediaQuery.removeEventListener('change', listener);
     }
   }, [settings.theme]);
 
@@ -334,6 +408,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         folders,
         categories,
         settings,
+        effectiveBackgroundDark,
+        effectiveBackgroundLuminance,
         notes,
         weather,
         isLoadingWeather,
@@ -341,6 +417,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         editingShortcut,
         activeFolderModal,
         folderCreationCandidate,
+        contextMenu,
+        openContextMenu,
+        closeContextMenu,
         openAddModal,
         openEditModal,
         closeModal,

@@ -5,7 +5,7 @@ import { SEARCH_ENGINES } from '../utils/searchEngines';
 import { formatUrl } from '../utils/favicon';
 
 export const SearchBar: React.FC = () => {
-  const { settings } = useApp();
+  const { settings, effectiveBackgroundDark } = useApp();
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,7 +43,7 @@ export const SearchBar: React.FC = () => {
   return (
     <div className="w-full max-w-2xl my-6">
       <form onSubmit={handleSearchSubmit} className="relative flex items-center">
-        <div className="absolute left-4 text-neutral-400 pointer-events-none">
+        <div className={`absolute left-4 pointer-events-none transition-colors ${effectiveBackgroundDark ? 'text-neutral-300' : 'text-neutral-400'}`}>
           <Search size={18} />
         </div>
 
@@ -54,7 +54,11 @@ export const SearchBar: React.FC = () => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Rechercher sur le web ou entrer une adresse URL..."
-          className="w-full pl-11 pr-20 py-3.5 rounded-2xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border border-neutral-200/90 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-xs transition-all"
+          className={`w-full pl-11 pr-20 py-3.5 rounded-2xl backdrop-blur-xl border text-sm shadow-xs transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+            effectiveBackgroundDark
+              ? 'bg-neutral-950/80 border-white/20 text-white placeholder-neutral-400 shadow-md'
+              : 'bg-white/95 border-neutral-200/90 text-neutral-900 placeholder-neutral-400'
+          }`}
           autoFocus
         />
 
@@ -63,7 +67,11 @@ export const SearchBar: React.FC = () => {
             <button
               type="button"
               onClick={() => setQuery('')}
-              className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 rounded-md cursor-pointer"
+              className={`p-1.5 rounded-md cursor-pointer transition-colors ${
+                effectiveBackgroundDark
+                  ? 'text-neutral-300 hover:text-white hover:bg-white/10'
+                  : 'text-neutral-400 hover:text-neutral-700'
+              }`}
             >
               <X size={16} />
             </button>
@@ -71,7 +79,11 @@ export const SearchBar: React.FC = () => {
           <button
             id="search-submit-btn"
             type="submit"
-            className="p-2 rounded-xl bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors cursor-pointer shadow-xs"
+            className={`p-2 rounded-xl transition-all cursor-pointer shadow-xs ${
+              effectiveBackgroundDark
+                ? 'bg-white text-neutral-950 hover:bg-neutral-100'
+                : 'bg-neutral-900 text-white hover:bg-neutral-800'
+            }`}
             title="Lancer la recherche"
           >
             <ArrowRight size={15} />

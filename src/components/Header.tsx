@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Settings, Sun, Moon, Image as ImageIcon } from 'lucide-react';
+import { Plus, Settings, Sun, Moon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { settings, updateSettings, openAddModal } = useApp();
+  const { settings, updateSettings, openAddModal, effectiveBackgroundDark } = useApp();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -30,19 +30,35 @@ export const Header: React.FC = () => {
     return formatted.charAt(0).toUpperCase() + formatted.slice(1);
   };
 
+  const isDarkMode =
+    settings.theme === 'dark' ||
+    (settings.theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
   const toggleTheme = () => {
-    const nextTheme = settings.theme === 'dark' ? 'light' : 'dark';
+    const nextTheme = isDarkMode ? 'light' : 'dark';
     updateSettings({ theme: nextTheme });
   };
 
   return (
     <header className="w-full max-w-5xl mx-auto pt-8 pb-4 px-4 sm:px-6 flex items-center justify-between">
-      {/* Clock & Date */}
+      {/* Clock & Date with dynamic high contrast */}
       <div className="flex flex-col select-none">
-        <span className="text-3xl sm:text-4xl font-light tracking-tight text-neutral-900 dark:text-neutral-100 font-mono drop-shadow-xs">
+        <span
+          className={`text-3xl sm:text-4xl font-light tracking-tight font-mono transition-colors duration-200 ${
+            effectiveBackgroundDark
+              ? 'text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]'
+              : 'text-neutral-900 drop-shadow-xs'
+          }`}
+        >
           {formatHours()}
         </span>
-        <span className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-300 capitalize drop-shadow-xs">
+        <span
+          className={`text-xs sm:text-sm font-medium capitalize transition-colors duration-200 ${
+            effectiveBackgroundDark
+              ? 'text-white/85 drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]'
+              : 'text-neutral-600 drop-shadow-xs'
+          }`}
+        >
           {formatDate()}
         </span>
       </div>
@@ -52,7 +68,11 @@ export const Header: React.FC = () => {
         <button
           id="header-add-shortcut-btn"
           onClick={() => openAddModal()}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors shadow-xs cursor-pointer"
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all shadow-xs cursor-pointer ${
+            effectiveBackgroundDark
+              ? 'bg-white text-neutral-950 hover:bg-neutral-100 hover:shadow-md'
+              : 'bg-neutral-900 text-white hover:bg-neutral-800'
+          }`}
         >
           <Plus size={15} />
           <span>Ajouter un raccourci</span>
@@ -61,17 +81,25 @@ export const Header: React.FC = () => {
         <button
           id="nav-theme-toggle-btn"
           onClick={toggleTheme}
-          title={settings.theme === 'dark' ? 'Mode Clair' : 'Mode Sombre'}
-          className="p-2 rounded-xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md text-neutral-600 dark:text-neutral-400 border border-neutral-200/90 dark:border-neutral-800 hover:bg-white dark:hover:bg-neutral-800 transition-colors cursor-pointer shadow-xs"
+          title={isDarkMode ? 'Passer en Mode Clair' : 'Passer en Mode Sombre'}
+          className={`p-2 rounded-xl backdrop-blur-md transition-all cursor-pointer shadow-xs border ${
+            effectiveBackgroundDark
+              ? 'bg-black/50 hover:bg-black/70 text-white border-white/20'
+              : 'bg-white/90 text-neutral-700 hover:bg-white border-neutral-200/90'
+          }`}
         >
-          {settings.theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          {isDarkMode ? <Sun size={17} /> : <Moon size={17} />}
         </button>
 
         <Link
           id="nav-settings-link"
           to="/settings"
           title="Paramètres & Arrière-plan"
-          className="p-2 rounded-xl bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md text-neutral-600 dark:text-neutral-400 border border-neutral-200/90 dark:border-neutral-800 hover:bg-white dark:hover:bg-neutral-800 transition-colors shadow-xs"
+          className={`p-2 rounded-xl backdrop-blur-md transition-all cursor-pointer shadow-xs border ${
+            effectiveBackgroundDark
+              ? 'bg-black/50 hover:bg-black/70 text-white border-white/20'
+              : 'bg-white/90 text-neutral-700 hover:bg-white border-neutral-200/90'
+          }`}
         >
           <Settings size={17} />
         </Link>

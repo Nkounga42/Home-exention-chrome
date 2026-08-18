@@ -6,12 +6,14 @@ import { GoogleToolsSection } from '../components/GoogleToolsSection';
 import { AddEditShortcutModal } from '../components/AddEditShortcutModal';
 import { FolderModal } from '../components/FolderModal';
 import { CreateFolderModal } from '../components/CreateFolderModal';
+import { ContextMenu } from '../components/ContextMenu';
 import { useApp } from '../context/AppContext';
 import { CURATED_WALLPAPERS } from '../utils/wallpapers';
 
 export const HomePage: React.FC = () => {
-  const { settings } = useApp();
+  const { settings, effectiveBackgroundDark } = useApp();
   const bg = settings.background;
+  const density = settings.density || 'normal';
 
   // Resolve active background image if applicable
   let activeImageUrl = '';
@@ -27,12 +29,30 @@ export const HomePage: React.FC = () => {
   const isSolidCustom = bg.type === 'solid' && bg.solidColor && bg.solidColor !== 'transparent';
   const hasImageBg = Boolean(activeImageUrl);
 
+  const getContainerMaxWidth = () => {
+    if (settings.gridColumns !== 'auto') {
+      const colNum = typeof settings.gridColumns === 'number' ? settings.gridColumns : parseInt(settings.gridColumns, 10);
+      if (colNum >= 8) return 'max-w-7xl';
+      if (colNum >= 6) return 'max-w-6xl';
+      if (colNum >= 5) return 'max-w-5xl';
+      return 'max-w-4xl';
+    }
+    if (settings.layoutStyle === 'icons') {
+      return density === 'compact' ? 'max-w-6xl' : density === 'comfortable' ? 'max-w-5xl' : 'max-w-5xl';
+    }
+    return density === 'compact' ? 'max-w-6xl' : density === 'comfortable' ? 'max-w-4xl' : 'max-w-5xl';
+  };
+
+  const containerMaxWidth = getContainerMaxWidth();
+
   return (
     <main
       className={`min-h-screen relative flex flex-col transition-colors duration-200 ${
         !hasImageBg && !isSolidCustom
           ? 'bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100'
-          : 'text-neutral-900 dark:text-neutral-100'
+          : effectiveBackgroundDark
+          ? 'text-white'
+          : 'text-neutral-900'
       }`}
       style={isSolidCustom ? { backgroundColor: bg.solidColor } : undefined}
     >
@@ -64,11 +84,11 @@ export const HomePage: React.FC = () => {
       {/* Top minimal Header */}
       <Header />
 
-      <div className="flex-1 flex flex-col items-center justify-start w-full max-w-5xl mx-auto px-4 sm:px-6 pt-4 pb-16">
+      <div className={`flex-1 flex flex-col items-center justify-start w-full ${containerMaxWidth} mx-auto px-4 sm:px-6 pt-4 pb-16 transition-all duration-200`}>
         {/* Main Search Bar */}
         <SearchBar />
 
-        {/* Clean Shortcut Grid */}
+        {/* Clean Shortcut Grid with selected density */}
         <ShortcutGrid />
 
         {/* Google Tools and Services Container Section */}
@@ -83,6 +103,9 @@ export const HomePage: React.FC = () => {
 
       {/* Create Folder from Drag & Drop Modal */}
       <CreateFolderModal />
+
+      {/* Global Context Menu */}
+      <ContextMenu />
     </main>
   );
 };

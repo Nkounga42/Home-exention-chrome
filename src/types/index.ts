@@ -42,6 +42,8 @@ export interface SearchEngine {
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type GridDensity = 'compact' | 'normal' | 'comfortable';
+export type ShortcutLayoutStyle = 'icons' | 'cards';
+export type GridColumns = 'auto' | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
 export type TimeFormat = '24h' | '12h';
 
 export type BackgroundType = 'solid' | 'curated' | 'custom' | 'daily_unsplash';
@@ -59,6 +61,8 @@ export interface BackgroundConfig {
 export interface AppSettings {
   theme: ThemeMode;
   density: GridDensity;
+  layoutStyle: ShortcutLayoutStyle; // 'icons' (icon on top, title under) or 'cards' (horizontal card)
+  gridColumns: GridColumns; // 'auto' or 2-10
   searchEngine: SearchEngineId;
   openInNewTab: boolean;
   showClock: boolean;
@@ -91,3 +95,14 @@ export interface NoteItem {
   completed: boolean;
   createdAt: number;
 }
+
+export type ContextMenuItemType = 'shortcut' | 'folder';
+
+export interface ContextMenuState {
+  isOpen: boolean;
+  x: number;
+  y: number;
+  type: ContextMenuItemType;
+  item: Shortcut | Folder;
+}
+
