@@ -1,0 +1,6 @@
+{
+  "name": "Page d'Accueil Chrome - Grille de Raccourcis",
+  "description": "Nouvelle page d'onglet Chrome personnalisable avec grille de raccourcis, recherche rapide, widgets et gestionnaire de liens.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
