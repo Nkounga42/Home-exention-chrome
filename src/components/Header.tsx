@@ -4,7 +4,7 @@ import { Plus, Settings, Sun, Moon } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const Header: React.FC = () => {
-  const { settings, updateSettings, openAddModal, isDarkMode, effectiveBackgroundDark } = useApp();
+  const { settings, updateSettings, openAddModal, openSettingsModal, isDarkMode, effectiveBackgroundDark } = useApp();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -87,9 +87,10 @@ export const Header: React.FC = () => {
           {isDarkMode ? <Sun size={17} /> : <Moon size={17} />}
         </button>
 
-        <Link
-          id="nav-settings-link"
-          to="/settings"
+        <button
+          type="button"
+          id="nav-settings-btn"
+          onClick={() => openSettingsModal()}
           title="Paramètres & Arrière-plan"
           className={`p-2 rounded-xl backdrop-blur-md transition-all cursor-pointer shadow-xs border ${
             isDarkMode
@@ -98,7 +99,7 @@ export const Header: React.FC = () => {
           }`}
         >
           <Settings size={17} />
-        </Link>
+        </button>
       </div>
     </header>
   );

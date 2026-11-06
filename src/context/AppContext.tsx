@@ -28,6 +28,8 @@ interface AppContextType {
   weather: WeatherData | null;
   isLoadingWeather: boolean;
   isAddModalOpen: boolean;
+  isSettingsModalOpen: boolean;
+  settingsModalTab: string;
   editingShortcut: Shortcut | null;
   activeFolderModal: Folder | null;
   folderCreationCandidate: { sourceId: string; targetId: string } | null;
@@ -37,6 +39,8 @@ interface AppContextType {
   openAddModal: (categoryId?: string, folderId?: string) => void;
   openEditModal: (shortcut: Shortcut) => void;
   closeModal: () => void;
+  openSettingsModal: (tab?: string) => void;
+  closeSettingsModal: () => void;
   openFolderModal: (folder: Folder) => void;
   closeFolderModal: () => void;
   setFolderCreationCandidate: (candidate: { sourceId: string; targetId: string } | null) => void;
@@ -73,6 +77,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [settingsModalTab, setSettingsModalTab] = useState<string>('appearance');
   const [editingShortcut, setEditingShortcut] = useState<Shortcut | null>(null);
   const [activeFolderModal, setActiveFolderModal] = useState<Folder | null>(null);
   const [folderCreationCandidate, setFolderCreationCandidate] = useState<{ sourceId: string; targetId: string } | null>(null);
@@ -400,6 +406,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setEditingShortcut(null);
   };
 
+  const openSettingsModal = (tab: string = 'appearance') => {
+    setSettingsModalTab(tab);
+    setIsSettingsModalOpen(true);
+  };
+
+  const closeSettingsModal = () => {
+    setIsSettingsModalOpen(false);
+  };
+
   const resetToDefaults = () => {
     localStorage.clear();
     window.location.reload();
@@ -419,6 +434,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         weather,
         isLoadingWeather,
         isAddModalOpen,
+        isSettingsModalOpen,
+        settingsModalTab,
         editingShortcut,
         activeFolderModal,
         folderCreationCandidate,
@@ -428,6 +445,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         openAddModal,
         openEditModal,
         closeModal,
+        openSettingsModal,
+        closeSettingsModal,
         openFolderModal,
         closeFolderModal,
         setFolderCreationCandidate,

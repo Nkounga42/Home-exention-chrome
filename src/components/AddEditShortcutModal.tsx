@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Link as LinkIcon, Globe, Sparkles } from 'lucide-react';
+import { X, Link as LinkIcon, Globe, Sparkles, ClipboardPaste, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { extractDomain, formatUrl } from '../utils/favicon';
 import { AVAILABLE_ICONS, getLucideIcon } from '../utils/icons';
@@ -32,6 +32,30 @@ export const AddEditShortcutModal: React.FC = () => {
   const [lucideIconName, setLucideIconName] = useState('Globe');
   const [color, setColor] = useState('#3b82f6');
   const [errorMessage, setErrorMessage] = useState('');
+  const [pasted, setPasted] = useState(false);
+
+  const handlePasteUrl = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text && text.trim()) {
+        const trimmed = text.trim();
+        setUrl(trimmed);
+        setPasted(true);
+        setTimeout(() => setPasted(false), 1500);
+
+        // If title is empty, infer from domain
+        if (!title.trim()) {
+          const domain = extractDomain(trimmed);
+          if (domain) {
+            const capitalized = domain.charAt(0).toUpperCase() + domain.slice(1).split('.')[0];
+            setTitle(capitalized);
+          }
+        }
+      }
+    } catch {
+      setErrorMessage("Impossible d'accéder au presse-papiers. Collez avec Ctrl+V / Cmd+V.");
+    }
+  };
 
   useEffect(() => {
     if (isAddModalOpen) {
@@ -159,22 +183,46 @@ export const AddEditShortcutModal: React.FC = () => {
             </div>
           )}
 
-          {/* URL Input */}
+          {/* URL Input with InputGroup and Paste Button */}
           <div>
             <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 flex items-center gap-1.5">
               <LinkIcon size={13} className="text-neutral-400" />
               <span>Adresse URL *</span>
             </label>
-            <input
-              type="text"
-              required
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              onBlur={handleUrlBlur}
-              placeholder="ex: github.com ou https://youtube.com"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-400 dark:focus:ring-neutral-600"
-              autoFocus
-            />
+            <div className="flex items-center rounded-xl bg-neutral-50 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 focus-within:ring-2 focus-within:ring-neutral-400 dark:focus-within:ring-neutral-600 focus-within:border-transparent transition-all overflow-hidden p-1 gap-1">
+              <input
+                type="text"
+                required
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                onBlur={handleUrlBlur}
+                placeholder="ex: github.com ou https://youtube.com"
+                className="flex-1 px-2.5 py-1.5 bg-transparent text-neutral-900 dark:text-neutral-100 text-sm focus:outline-none placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={handlePasteUrl}
+                title="Coller depuis le presse-papiers"
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex-shrink-0 select-none ${
+                  pasted
+                    ? 'bg-green-600 text-white'
+                    : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-600 hover:text-neutral-900 dark:hover:text-white'
+                }`}
+              >
+                {pasted ? (
+                  <>
+                    <Check size={14} className="stroke-[2.5]" />
+                    <span>Collé</span>
+                  </>
+                ) : (
+                  <>
+                    <ClipboardPaste size={14} />
+                    <span>Coller</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
           {/* Title Input */}

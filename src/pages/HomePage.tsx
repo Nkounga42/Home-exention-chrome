@@ -7,11 +7,12 @@ import { AddEditShortcutModal } from '../components/AddEditShortcutModal';
 import { FolderModal } from '../components/FolderModal';
 import { CreateFolderModal } from '../components/CreateFolderModal';
 import { ContextMenu } from '../components/ContextMenu';
+import { SettingsModal, SettingsTab } from '../components/SettingsModal';
 import { useApp } from '../context/AppContext';
 import { CURATED_WALLPAPERS } from '../utils/wallpapers';
 
 export const HomePage: React.FC = () => {
-  const { settings, effectiveBackgroundDark } = useApp();
+  const { settings, effectiveBackgroundDark, isSettingsModalOpen, closeSettingsModal, settingsModalTab } = useApp();
   const bg = settings.background;
   const density = settings.density || 'normal';
 
@@ -106,6 +107,13 @@ export const HomePage: React.FC = () => {
 
       {/* Global Context Menu */}
       <ContextMenu />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={closeSettingsModal}
+        initialTab={(settingsModalTab as SettingsTab) || 'appearance'}
+      />
     </main>
   );
 };
